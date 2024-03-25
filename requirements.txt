@@ -1,0 +1,7 @@
+Aspose.Slides==24.3.0
+aspose_words==24.3.0
+cvzone==1.6.1
+numpy==1.26.4
+opencv_contrib_python==4.9.0.80
+opencv_python==4.9.0.80
+streamlit==1.32.2
