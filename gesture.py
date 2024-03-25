@@ -6,7 +6,7 @@ import numpy as np
 # Parameters
 width, height = 1280, 720
 gestureThreshold = 600
-folderPath = "C:\\Users\\nooka\\OneDrive\\Documents\\Project\\sample"
+folderPath = "sample"
 
 # Camera Setup
 cap = cv2.VideoCapture(0)

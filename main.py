@@ -42,7 +42,7 @@ def main():
         # Check if a presentation file is uploaded
         if uploaded_file is not None:
             # Set the target folder path
-            target_folder = "C:\\Users\\nooka\\OneDrive\\Documents\\Project"
+            target_folder = "Project"
 
             # Save the uploaded PPTX file
             pptx_path = os.path.join(target_folder, "presentation.pptx")
@@ -50,7 +50,7 @@ def main():
                 pptx_file.write(uploaded_file.read())
 
             # Execute "gesture.py"
-            process = subprocess.Popen(["python", "-u", "C:\\Users\\nooka\\OneDrive\\Documents\\Project\\gesture.py"], stdout=subprocess.PIPE,
+            process = subprocess.Popen(["python", "-u", "gesture.py"], stdout=subprocess.PIPE,
                                        stderr=subprocess.PIPE)
             stdout, stderr = process.communicate()
             print("STDOUT:", stdout.decode('utf-8'))
@@ -63,10 +63,10 @@ def main():
         # Check if a presentation file is uploaded
         if uploaded_file is not None:
             # Set the target folder path for converted images
-            output_folder = "C:\\Users\\nooka\\OneDrive\\Documents\\Project\\PRESENTATION"
+            output_folder = "PRESENTATION"
 
             # Save the uploaded PPTX file
-            pptx_path = "C:\\Users\\nooka\\OneDrive\\Documents\\Project\\pptxfile.pptx"
+            pptx_path = "pptxfile.pptx"
             with open(pptx_path, "wb") as pptx_file:
                 pptx_file.write(uploaded_file.read())
 
