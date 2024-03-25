@@ -4,6 +4,20 @@ import os
 import subprocess
 import aspose.slides as slides
 import aspose.pydrawing as drawing
+from pptx import Presentation
+from PIL import Image
+
+def convert_pptx_to_images(pptx_file, output_folder):
+    prs = Presentation(pptx_file)
+    for i, slide in enumerate(prs.slides):
+        image = Image.new('RGB', (prs.slide_width, prs.slide_height), (255, 255, 255))
+        for shape in slide.shapes:
+            if hasattr(shape, 'image'):
+                image_path = f"{output_folder}/slide_{i + 1}.png"
+                shape.image.save(image_path)
+                break
+        image.save(image_path)
+
 
 def convert_ppt_to_png(pptx_path, output_folder):
     # Load presentation
@@ -71,7 +85,7 @@ def main():
                 pptx_file.write(uploaded_file.read())
 
             # Convert PPTX to PNG
-            convert_ppt_to_png(pptx_path, output_folder)
+            convert_pptx_to_images(pptx_path, output_folder)
 
             st.success("PPT is converted to PNGs.")
 

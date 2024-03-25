@@ -4,6 +4,4 @@ cvzone==1.6.1
 numpy==1.26.4
 opencv_contrib_python==4.9.0.80
 opencv_python==4.9.0.80
-Pillow==10.2.0
-python_pptx==0.6.23
 streamlit==1.32.2
