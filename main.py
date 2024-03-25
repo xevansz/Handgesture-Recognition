@@ -10,7 +10,8 @@ from PIL import Image
 def convert_pptx_to_images(pptx_file, output_folder):
     prs = Presentation(pptx_file)
     for i, slide in enumerate(prs.slides):
-        image = Image.new('RGB', (prs.slide_width, prs.slide_height), (255, 255, 255))
+        image_width, image_height = prs.slide_width, prs.slide_height
+        image = Image.new('RGB', (image_width, image_height), (255, 255, 255))
         for shape in slide.shapes:
             if hasattr(shape, 'image'):
                 image_path = f"{output_folder}/slide_{i + 1}.png"
