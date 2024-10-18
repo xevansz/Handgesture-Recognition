@@ -11,7 +11,7 @@ HandGesture recognition enables users to control slide presentations through han
 - **CVzone** : Developed with ReactJS, this website uses your device's camera to recognize hand gestures for slide control. 
 - **numpy** : Facilitates navigation through a Google Slides presentation by communicating with the Remote Website via WebSockets. 
 
-## Screenshots
+<!-- ## Screenshots
 <table>
   <tr>
     <td><img src="https://lh3.googleusercontent.com/o8aGS4zceshid4rtJhn4aU5qhKl5S4hkjMqN2HtFyYTzEXFmCAbAZcXKm0BjU16CAQiqUkE_uIO52Q2s5xQOenKEqQ=s1600-w1600-h1000" alt="Extension Screenshot" style="width: 100%; max-width: 600px;"/></td>
@@ -21,7 +21,7 @@ HandGesture recognition enables users to control slide presentations through han
     <td><img src="https://lh3.googleusercontent.com/w4GUV-f_twURLcmYQqrENRvZ59GXFGGiW8wWsalwWW1Por54TbpX-o3Fwg8b1z6IJlwn8x20wTTsOkGTbCqsxlr0kw=s1600-w1600-h1000" alt="Demo Gesture Right" style="width: 100%; max-width: 600px;"/></td>
     <td><img src="https://lh3.googleusercontent.com/I6-zaEHLxCnGiUH7n6kwBQIZCJK7ZJdxBOJ7OVX1X7XAUGQGtNGDWVJMIUlS6-Z-hppxa5P0kVaQQ3EIH5_kBVOXPw=s1600-w1600-h1000" alt="Demo Gesture Right" style="width: 100%; max-width: 600px;"/></td>
   </tr>
-</table>
+</table> -->
 
 ## Getting Started
 ### Prerequisites 
