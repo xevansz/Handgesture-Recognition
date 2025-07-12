@@ -2,4 +2,4 @@
 __pycache__/
 
 # virtual env
-myenv/
+.venv/
