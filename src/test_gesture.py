@@ -47,19 +47,11 @@ def test_config_loading():
         print(f"✗ Failed to import GestureController: {e}")
         return False
     
-    # Test config creation
+    # Test config loading from existing config file
     try:
-        # Create a temporary config file
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
-            f.write('{"width": 640, "height": 480}')
-            temp_config = f.name
-        
-        # Test loading config
-        controller = GestureController(temp_config)
+        # Test loading the actual config file
+        controller = GestureController("config/gesture_config.json")
         print("✓ Configuration loading works")
-        
-        # Cleanup
-        os.unlink(temp_config)
         return True
         
     except Exception as e:

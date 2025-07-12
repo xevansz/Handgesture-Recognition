@@ -16,7 +16,7 @@ class GestureController:
     Hand gesture recognition controller for presentation navigation and annotation.
     """
     
-    def __init__(self, config_file: str = "gesture_config.json"):
+    def __init__(self, config_file: str = "config/gesture_config.json"):
         """Initialize the gesture controller with configuration."""
         self.config = self._load_config(config_file)
         
@@ -24,7 +24,7 @@ class GestureController:
         self.width = self.config.get('width', 1280)
         self.height = self.config.get('height', 720)
         self.gesture_threshold = self.config.get('gesture_threshold', 600)
-        self.folder_path = self.config.get('folder_path', 'images')
+        self.folder_path = self.config.get('folder_path', 'data/slides/images')
         
         # Hand detection parameters
         self.detection_confidence = self.config.get('detection_confidence', 0.8)
@@ -36,6 +36,10 @@ class GestureController:
         self.annotation_thickness = self.config.get('annotation_thickness', 12)
         
         # Initialize components
+        # The following methods are defined as private methods within this class:
+        # - self._setup_camera(): Initializes the camera for capturing video frames.
+        # - self._setup_hand_detector(): Sets up the hand detection module.
+        # - self._load_presentation_images(): Loads images used for the presentation.
         self._setup_camera()
         self._setup_hand_detector()
         self._load_presentation_images()
@@ -44,44 +48,19 @@ class GestureController:
         self.reset_state()
         
     def _load_config(self, config_file: str) -> Dict:
-        """Load configuration from JSON file or use defaults."""
-        default_config = {
-            'width': 1280,
-            'height': 720,
-            'gesture_threshold': 600,
-            'folder_path': 'images',
-            'detection_confidence': 0.8,
-            'max_hands': 1,
-            'delay': 7,
-            'annotation_color': [0, 0, 255],
-            'annotation_thickness': 12,
-            'gestures': {
-                'next_slide': [0, 0, 0, 0, 1],      # Thumb up
-                'previous_slide': [1, 0, 0, 0, 0],   # Index finger only
-                'draw': [0, 1, 0, 0, 0],             # Index finger only
-                'erase': [0, 1, 1, 1, 0],            # Three fingers
-                'pointer': [0, 1, 1, 0, 0]           # Two fingers
-            }
-        }
-        
+        """Load configuration from JSON file."""
         try:
             if os.path.exists(config_file):
                 with open(config_file, 'r') as f:
                     config = json.load(f)
-                    # Merge with defaults
-                    for key, value in default_config.items():
-                        if key not in config:
-                            config[key] = value
-                    return config
+                logger.info(f"Loaded configuration from {config_file}")
+                return config
             else:
-                # Create default config file
-                with open(config_file, 'w') as f:
-                    json.dump(default_config, f, indent=2)
-                logger.info(f"Created default config file: {config_file}")
-                return default_config
+                logger.error(f"Configuration file not found: {config_file}")
+                raise FileNotFoundError(f"Configuration file not found: {config_file}")
         except Exception as e:
             logger.error(f"Error loading config: {e}")
-            return default_config
+            raise RuntimeError(f"Failed to load configuration: {e}")
     
     def _setup_camera(self):
         """Initialize camera with error handling."""
@@ -355,7 +334,7 @@ def main():
         print(f"Error: {e}")
         print("Please check that:")
         print("1. Camera is connected and working")
-        print("2. 'images' folder exists with presentation images")
+        print("2. 'data/slides/images' folder exists with presentation images")
         print("3. All dependencies are installed")
 
 if __name__ == "__main__":
