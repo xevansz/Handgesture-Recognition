@@ -18,7 +18,7 @@ def convert_pptx_to_pdf(pptx_path, pdf_path):
             'libreoffice', 
             '--headless', 
             '--convert-to', 'pdf', 
-            '--outdir', os.path.dirname(pdf_path),
+            '--outdir', 'data/pdf',
             pptx_path
         ]
         
@@ -105,6 +105,44 @@ def convert_ppt_to_png(pptx_path, output_folder):
         st.error(f"❌ Error in conversion workflow: {e}")
         return False
 
+def cleanup_presentation_files(pptx_path=None, pdf_path=None):
+    """Clean up presentation files after completion."""
+    try:
+        # Clean up images directory
+        images_dir = "data/slides/images"
+        if os.path.exists(images_dir):
+            for file in os.listdir(images_dir):
+                if file.lower().endswith(('.png', '.jpg', '.jpeg')):
+                    os.remove(os.path.join(images_dir, file))
+            st.success("🧹 Cleaned up presentation images")
+        
+        # Ask user about PPTX file cleanup
+        if pptx_path and os.path.exists(pptx_path):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                if st.button("💾 Keep PPTX file", type="secondary"):
+                    # Only remove PDF file, keep PPTX
+                    if pdf_path and os.path.exists(pdf_path):
+                        os.remove(pdf_path)
+                    st.success("💾 Kept PPTX file, removed PDF")
+                    return True
+            
+            with col2:
+                if st.button("🗑️ Remove PPTX file too", type="secondary"):
+                    # Remove both PPTX and PDF files
+                    os.remove(pptx_path)
+                    if pdf_path and os.path.exists(pdf_path):
+                        os.remove(pdf_path)
+                    st.success("🗑️ Removed PPTX and PDF files")
+                    return True
+        
+        return True
+        
+    except Exception as e:
+        st.error(f"❌ Error during cleanup: {e}")
+        return False
+
 def main():
     """Main Streamlit application."""
     
@@ -120,18 +158,27 @@ def main():
     st.subheader("Control Presentations with Hand Gestures")
     st.markdown("---")
 
-    # Sidebar for navigation
+    # Navigation - vertical display
     st.sidebar.title("Navigation")
-    page = st.sidebar.selectbox(
-        "Choose a page",
-        ["Upload & Convert", "Gesture Control", "Settings"]
-    )
-
-    if page == "Upload & Convert":
+    
+    if st.sidebar.button("📤 Upload & Convert", use_container_width=True):
+        st.session_state.page = "Upload & Convert"
+    
+    if st.sidebar.button("🎮 Gesture Control", use_container_width=True):
+        st.session_state.page = "Gesture Control"
+    
+    if st.sidebar.button("⚙️ Settings", use_container_width=True):
+        st.session_state.page = "Settings"
+    
+    # Default page
+    if 'page' not in st.session_state:
+        st.session_state.page = "Upload & Convert"
+    
+    if st.session_state.page == "Upload & Convert":
         upload_and_convert_page()
-    elif page == "Gesture Control":
+    elif st.session_state.page == "Gesture Control":
         gesture_control_page()
-    elif page == "Settings":
+    elif st.session_state.page == "Settings":
         settings_page()
 
 def upload_and_convert_page():
@@ -154,6 +201,7 @@ def upload_and_convert_page():
                 # Save the uploaded PPTX file
                 pptx_path = "data/presentations/uploaded_presentation.pptx"
                 os.makedirs("data/presentations", exist_ok=True)
+                os.makedirs("data/pdf", exist_ok=True)
                 
                 with open(pptx_path, "wb") as pptx_file:
                     pptx_file.write(uploaded_file.read())
@@ -190,6 +238,21 @@ def upload_and_convert_page():
                     st.error(f"❌ Failed to start gesture controller: {e}")
             else:
                 st.warning("⚠️ Please convert slides first before starting gesture control.")
+
+    # Cleanup section
+    st.markdown("---")
+    st.subheader("🧹 Cleanup After Presentation")
+    
+    if os.path.exists("data/slides/images") and len(os.listdir("data/slides/images")) > 0:
+        st.info("💡 After your presentation is complete, you can clean up the files:")
+        
+        pptx_path = "data/presentations/uploaded_presentation.pptx"
+        pdf_path = "data/pdf/uploaded_presentation.pdf"
+        
+        if st.button("🧹 Clean Up Files", type="primary"):
+            cleanup_presentation_files(pptx_path, pdf_path)
+    else:
+        st.info("💡 No presentation files to clean up yet.")
 
     # Display current slides
     if os.path.exists("data/slides/images"):
