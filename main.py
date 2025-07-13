@@ -2,37 +2,107 @@
 import streamlit as st
 import os
 import subprocess
-import aspose.slides as slides
-import aspose.pydrawing as drawing
-from pptx import Presentation
 import sys
 from pathlib import Path
+import tempfile
+import shutil
 
 # Add src directory to path for imports
 sys.path.append(str(Path(__file__).parent / "src"))
 
-def convert_ppt_to_png(pptx_path, output_folder):
-    """Convert PowerPoint presentation to PNG images."""
+def convert_pptx_to_pdf(pptx_path, pdf_path):
+    """Convert PowerPoint presentation to PDF using LibreOffice."""
     try:
-        # Load presentation
-        pres = slides.Presentation(pptx_path)
-
-        # Create the output folder if it doesn't exist
-        os.makedirs(output_folder, exist_ok=True)
-
-        # Loop through slides
-        for index in range(pres.slides.length):
-            # Get reference to slide
-            slide = pres.slides[index]
-
-            # Save as image
-            image_path = os.path.join(output_folder, f"{index + 1}.jpeg")
-            slide.get_thumbnail().save(image_path, drawing.imaging.ImageFormat.jpeg)
-
-        st.success(f"✅ Converted {pres.slides.length} slides to images")
-        return True
+        # Use LibreOffice to convert PPTX to PDF
+        cmd = [
+            'libreoffice', 
+            '--headless', 
+            '--convert-to', 'pdf', 
+            '--outdir', os.path.dirname(pdf_path),
+            pptx_path
+        ]
+        
+        st.info("🔄 Converting PPTX to PDF using LibreOffice...")
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+        
+        if result.returncode == 0:
+            # LibreOffice saves with the same name but .pdf extension
+            expected_pdf = pptx_path.replace('.pptx', '.pdf')
+            if os.path.exists(expected_pdf):
+                # Move to our desired location
+                shutil.move(expected_pdf, pdf_path)
+                st.success("✅ PPTX converted to PDF successfully!")
+                return True
+            else:
+                st.error(f"❌ PDF file not found at expected location: {expected_pdf}")
+                return False
+        else:
+            st.error(f"❌ LibreOffice conversion failed: {result.stderr}")
+            return False
+            
+    except subprocess.TimeoutExpired:
+        st.error("❌ LibreOffice conversion timed out")
+        return False
     except Exception as e:
-        st.error(f"❌ Error converting presentation: {e}")
+        st.error(f"❌ Error converting PPTX to PDF: {e}")
+        return False
+
+def convert_pdf_to_images(pdf_path, output_folder):
+    """Convert PDF to PNG images using pdf2image."""
+    try:
+        from pdf2image import convert_from_path
+        
+        st.info("🔄 Converting PDF to images...")
+        
+        # Check if PDF exists
+        if not os.path.exists(pdf_path):
+            st.error(f"PDF file '{pdf_path}' not found!")
+            return False
+        
+        # Create output directory if it doesn't exist
+        os.makedirs(output_folder, exist_ok=True)
+        
+        # Convert PDF to images
+        images = convert_from_path(
+            pdf_path,
+            dpi=200,
+            use_cropbox=False,
+            use_pdftocairo=True
+        )
+        
+        # Save each page as an image
+        for i, image in enumerate(images):
+            image_path = os.path.join(output_folder, f"{i + 1}.png")
+            image.save(image_path, "PNG")
+        
+        # Count the generated images
+        image_files = [f for f in os.listdir(output_folder) 
+                     if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
+        st.success(f"✅ Converted PDF to {len(image_files)} images")
+        return True
+        
+    except Exception as e:
+        st.error(f"❌ Error converting PDF to images: {e}")
+        return False
+
+def convert_ppt_to_png(pptx_path, output_folder):
+    """Convert PowerPoint presentation to PNG images using new workflow."""
+    try:
+        # Create temporary directory for intermediate files
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Step 1: Convert PPTX to PDF
+            pdf_path = os.path.join(temp_dir, "presentation.pdf")
+            if not convert_pptx_to_pdf(pptx_path, pdf_path):
+                return False
+            
+            # Step 2: Convert PDF to PNG images
+            if not convert_pdf_to_images(pdf_path, output_folder):
+                return False
+            
+            return True
+            
+    except Exception as e:
+        st.error(f"❌ Error in conversion workflow: {e}")
         return False
 
 def main():
@@ -143,6 +213,15 @@ def gesture_control_page():
     st.header("🎮 Gesture Control Guide")
     
     st.markdown("""
+    ### Workflow
+    
+    **PPTX → PDF → PNG → Gesture Control**
+    
+    1. **Upload PPTX** file through Streamlit
+    2. **Convert to PDF** using LibreOffice
+    3. **Convert PDF to PNG** images using pdf2image
+    4. **Control with gestures** using hand recognition
+    
     ### Hand Gestures
     
     Position your hand at face level (above the green threshold line) and use these gestures:
@@ -161,6 +240,12 @@ def gesture_control_page():
     - `r`: Reset all annotations
     - `n`: Next slide
     - `p`: Previous slide
+    
+    ### System Requirements
+    
+    - **LibreOffice**: For PPTX to PDF conversion
+    - **Poppler**: For PDF to image conversion (`sudo pacman -S poppler`)
+    - **Camera**: For gesture recognition
     
     ### Tips for Best Results
     
