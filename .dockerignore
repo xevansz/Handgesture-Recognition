@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+.env
+.git/
+data/slides/images/
+data/slides/pdf/
+data/pptx/
+.DS_Store
+Thumbs.db 
