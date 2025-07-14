@@ -26,8 +26,10 @@ def convert_pptx_to_pdf(pptx_path, pdf_path):
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
         
         if result.returncode == 0:
-            # LibreOffice saves with the same name but .pdf extension
-            expected_pdf = pptx_path.replace('.pptx', '.pdf')
+            # LibreOffice saves with the same name but .pdf extension in the output dir
+            import os
+            pdf_basename = os.path.splitext(os.path.basename(pptx_path))[0] + ".pdf"
+            expected_pdf = os.path.join("data/slides/pdf", pdf_basename)
             if os.path.exists(expected_pdf):
                 # Move to our desired location
                 shutil.move(expected_pdf, pdf_path)

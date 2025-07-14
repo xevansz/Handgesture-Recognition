@@ -317,11 +317,19 @@ class GestureController:
         finally:
             self.cleanup()
     
+    def stop_presentation(self):
+        """Stop the presentation and clean up all resources (camera, windows)."""
+        self.cleanup()
+    
     def cleanup(self):
         """Clean up resources."""
-        if hasattr(self, 'cap'):
+        if hasattr(self, 'cap') and self.cap is not None:
             self.cap.release()
-        cv2.destroyAllWindows()
+            self.cap = None
+        try:
+            cv2.destroyAllWindows()
+        except Exception as e:
+            logger.error(f"Error closing OpenCV windows: {e}")
         logger.info("Cleanup completed")
 
 def main():
