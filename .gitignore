@@ -1,5 +1,52 @@
-# pycache folder
+# Byte-compiled / optimized / DLL files
 __pycache__/
+*.py[cod]
+*$py.class
 
-# virtual env
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
 .venv/
+venv/
+ENV/
+
+# Streamlit cache
+.streamlit/
+
+# VSCode
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test and temp files
+*.log
+*.tmp
+*.bak
+
+# Ignore generated data
+/data/slides/images/
+/data/slides/pdf/
+/data/pdf/
+
+# Ignore config secrets
+config/*.secret.json

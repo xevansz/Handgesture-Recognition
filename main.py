@@ -18,7 +18,7 @@ def convert_pptx_to_pdf(pptx_path, pdf_path):
             'libreoffice', 
             '--headless', 
             '--convert-to', 'pdf', 
-            '--outdir', 'data/pdf',
+            '--outdir', 'data/slides/pdf',
             pptx_path
         ]
         
@@ -61,7 +61,7 @@ def convert_pdf_to_images(pdf_path, output_folder):
         
         # Create output directory if it doesn't exist
         os.makedirs(output_folder, exist_ok=True)
-        
+
         # Convert PDF to images
         images = convert_from_path(
             pdf_path,
@@ -112,7 +112,7 @@ def cleanup_presentation_files(pptx_path=None, pdf_path=None):
         images_dir = "data/slides/images"
         if os.path.exists(images_dir):
             for file in os.listdir(images_dir):
-                if file.lower().endswith(('.png', '.jpg', '.jpeg')):
+                if file.lower().endswith((".png", ".jpg", ".jpeg")):
                     os.remove(os.path.join(images_dir, file))
             st.success("🧹 Cleaned up presentation images")
         
@@ -199,9 +199,9 @@ def upload_and_convert_page():
         if st.button("🔄 Convert Slides", type="primary"):
             if uploaded_file is not None:
                 # Save the uploaded PPTX file
-                pptx_path = "data/presentations/uploaded_presentation.pptx"
-                os.makedirs("data/presentations", exist_ok=True)
-                os.makedirs("data/pdf", exist_ok=True)
+                pptx_path = "data/pptx/uploaded_presentation.pptx"
+                os.makedirs("data/pptx", exist_ok=True)
+                os.makedirs("data/slides/pdf", exist_ok=True)
                 
                 with open(pptx_path, "wb") as pptx_file:
                     pptx_file.write(uploaded_file.read())
@@ -246,8 +246,8 @@ def upload_and_convert_page():
     if os.path.exists("data/slides/images") and len(os.listdir("data/slides/images")) > 0:
         st.info("💡 After your presentation is complete, you can clean up the files:")
         
-        pptx_path = "data/presentations/uploaded_presentation.pptx"
-        pdf_path = "data/pdf/uploaded_presentation.pdf"
+        pptx_path = "data/pptx/uploaded_presentation.pptx"
+        pdf_path = "data/slides/pdf/uploaded_presentation.pdf"
         
         if st.button("🧹 Clean Up Files", type="primary"):
             cleanup_presentation_files(pptx_path, pdf_path)
@@ -343,12 +343,13 @@ Handgesture-Recognition/
 ├── src/                    # Source code
 ├── config/                 # Configuration files
 ├── data/                   # Data and assets
-│   ├── presentations/      # Original PPTX files
-│   ├── slides/            # Converted images
-│   └── samples/           # Sample images
+│   ├── pptx/               # Original PPTX files
+│   ├── slides/             # Converted images and PDFs
+│   │   ├── images/         # Slide images
+│   │   └── pdf/            # Slide PDFs
+│   └── samples/            # Sample images
 ├── docs/                   # Documentation
-└── assets/                 # Static assets
-    """)
+""")
 
 if __name__ == "__main__":
     main() 

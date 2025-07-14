@@ -23,24 +23,21 @@ Handgesture-Recognition/
 ├── 📁 src/                          # Source code
 │   ├── main.py                      # Streamlit web app
 │   ├── gesture.py                   # Gesture controller
-│   ├── theft.py                     # Alternative conversion
-│   └── test_gesture.py              # Test script
 │
 ├── 📁 config/                       # Configuration
 │   ├── gesture_config.json          # Gesture settings
 │   └── requirements.txt             # Dependencies
 │
 ├── 📁 data/                         # Data and assets
-│   ├── presentations/               # Original PPTX files
-│   ├── slides/                      # Converted images
+│   ├── pptx/                        # Original PPTX files
+│   ├── slides/                      # Converted slides
+│   │   ├── images/                  # Slide images (PNG/JPG)
+│   │   └── pdf/                     # Slide PDFs
 │   └── samples/                     # Sample images
 │
 ├── 📁 docs/                         # Documentation
 │   ├── README.md                    # This file
 │   └── reports/                     # Project reports
-│
-└── 📁 assets/                       # Static assets
-    └── logo.png                     # Project logo
 ```
 
 ## 🎯 Features
@@ -55,8 +52,8 @@ Handgesture-Recognition/
 
 ### Web Interface
 1. Run `python src/main.py`
-2. Upload your PPTX file
-3. Convert slides to images
+2. Upload your PPTX file (stored in `data/pptx/`)
+3. Convert slides to images (output in `data/slides/images/`)
 4. Start gesture control
 
 ### Direct Gesture Control
@@ -89,7 +86,7 @@ Edit `config/gesture_config.json` to customize:
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Test with `python src/test_gesture.py`
+4. Test your changes
 5. Submit a pull request
 
 ## 📄 License

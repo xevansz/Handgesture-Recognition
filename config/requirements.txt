@@ -1,15 +1,8 @@
-aspose-words==24.10.0
-Aspose.Slides==24.10.0
-mediapipe==0.10.15
-opencv-python==4.10.0.84
-cvzone==1.6.1
-numpy==1.26.4
-opencv-contrib-python==4.10.0.84
-pandas==2.2.3
-pillow==10.4.0
-python-pptx==1.0.2
-requests==2.32.3
-streamlit==1.39.0
-# Optional development dependencies
-mypy==1.8.0  # For type checking
-pytest==8.0.0  # For testing
+streamlit>=1.28.0
+opencv-python>=4.8.0
+cvzone>=1.6.0
+mediapipe>=0.10.0
+numpy>=1.24.0
+Pillow>=10.0.0
+pdf2image>=1.16.3
+python-pptx>=0.6.21 
