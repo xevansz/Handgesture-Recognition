@@ -7,7 +7,6 @@ RUN apt-get update && \
         libreoffice \
         poppler-utils \
         build-essential \
-        ttf-mscorefonts-installer \
         wget \
         && rm -rf /var/lib/apt/lists/*
 
