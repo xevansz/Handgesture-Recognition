@@ -27,7 +27,6 @@ def convert_pptx_to_pdf(pptx_path, pdf_path):
         
         if result.returncode == 0:
             # LibreOffice saves with the same name but .pdf extension in the output dir
-            import os
             pdf_basename = os.path.splitext(os.path.basename(pptx_path))[0] + ".pdf"
             expected_pdf = os.path.join("data/slides/pdf", pdf_basename)
             if os.path.exists(expected_pdf):
@@ -186,107 +185,105 @@ def main():
 def upload_and_convert_page():
     """Page for uploading and converting presentations."""
     st.header("📤 Upload & Convert Presentation")
-    
+    # Define paths at the top for DRYness
+    pptx_path = "data/pptx/uploaded_presentation.pptx"
+    pdf_path = "data/slides/pdf/uploaded_presentation.pdf"
+    images_dir = "data/slides/images"
     # File upload for presentation
     uploaded_file = st.file_uploader(
         "Upload Presentation File (PPTX)", 
         type=["pptx"],
         help="Select a PowerPoint presentation file"
     )
-
     col1, col2 = st.columns(2)
-
     with col1:
         # Convert slides button
         if st.button("🔄 Convert Slides", type="primary"):
             if uploaded_file is not None:
-                # Save the uploaded PPTX file
-                pptx_path = "data/pptx/uploaded_presentation.pptx"
                 os.makedirs("data/pptx", exist_ok=True)
                 os.makedirs("data/slides/pdf", exist_ok=True)
-                
                 with open(pptx_path, "wb") as pptx_file:
                     pptx_file.write(uploaded_file.read())
-
                 # Convert PPTX to images
-                output_folder = "data/slides/images"
+                output_folder = images_dir
                 if convert_ppt_to_png(pptx_path, output_folder):
                     st.success("✅ Slides converted successfully!")
                     st.info("💡 You can now use gesture control to navigate through the slides.")
             else:
                 st.warning("⚠️ Please upload a presentation file first.")
-
     with col2:
-        # Start gesture control button
-        if st.button("🎮 Start Gesture Control"):
-            if os.path.exists("data/slides/images") and len(os.listdir("data/slides/images")) > 0:
-                st.info("🚀 Starting gesture controller...")
-                
-                # Execute gesture controller
+        start, stop = st.columns(2)
+        # Track process state in session_state
+        if 'gesture_process' not in st.session_state:
+            st.session_state.gesture_process = None
+        # Status indicator
+        if st.session_state.gesture_process is not None and st.session_state.gesture_process.poll() is None:
+            st.success("Gesture controller is running.")
+            process_running = True
+        else:
+            process_running = False
+            st.session_state.gesture_process = None
+        with start:
+            if st.button("🎮 Start Gesture Control", disabled=process_running):
+                if os.path.exists(images_dir) and len(os.listdir(images_dir)) > 0:
+                    st.info("🚀 Starting gesture controller...")
+                    try:
+                        process = subprocess.Popen(
+                            ["python", "src/gesture.py"], 
+                            stdout=subprocess.DEVNULL,
+                            stderr=subprocess.DEVNULL,
+                            start_new_session=True
+                        )
+                        st.session_state.gesture_process = process
+                        st.success("✅ Gesture controller started in background!")
+                    except Exception as e:
+                        st.error(f"❌ Failed to start gesture controller: {e}")
+                else:
+                    st.warning("⚠️ Please convert slides first before starting gesture control.")
+        with stop:
+            if st.button("🛑 Stop Presenting", type="secondary", disabled=not process_running):
+                st.info("Attempting to stop gesture controller and clean up camera...")
                 try:
-                    process = subprocess.Popen(
-                        ["python", "src/gesture.py"], 
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.PIPE
-                    )
-                    stdout, stderr = process.communicate()
-                    
-                    if process.returncode == 0:
-                        st.success("✅ Gesture controller started successfully!")
-                    else:
-                        st.error(f"❌ Error starting gesture controller: {stderr.decode('utf-8')}")
-                        
+                    if st.session_state.gesture_process is not None:
+                        st.session_state.gesture_process.terminate()
+                        st.session_state.gesture_process = None
+                    if sys.platform.startswith('linux') or sys.platform == 'darwin':
+                        subprocess.run("pkill -f 'python.*gesture.py'", shell=True)
+                        subprocess.run("fuser -k /dev/video0", shell=True)
+                    elif sys.platform == 'win32':
+                        subprocess.run("taskkill /F /IM python.exe /T", shell=True)
+                    st.success("🛑 Presentation stopped. Camera and windows cleaned up.")
                 except Exception as e:
-                    st.error(f"❌ Failed to start gesture controller: {e}")
-            else:
-                st.warning("⚠️ Please convert slides first before starting gesture control.")
-
+                    st.error(f"Error stopping presentation: {e}")
     # Cleanup section
     st.markdown("---")
     st.subheader("🧹 Cleanup After Presentation")
-    
-    if os.path.exists("data/slides/images") and len(os.listdir("data/slides/images")) > 0:
+    if os.path.exists(images_dir) and len(os.listdir(images_dir)) > 0:
         st.info("💡 After your presentation is complete, you can clean up the files:")
-        
-        pptx_path = "data/pptx/uploaded_presentation.pptx"
-        pdf_path = "data/slides/pdf/uploaded_presentation.pdf"
-        
         if st.button("🧹 Clean Up Files", type="primary"):
             cleanup_presentation_files(pptx_path, pdf_path)
     else:
         st.info("💡 No presentation files to clean up yet.")
-
     # Display current slides
-    if os.path.exists("data/slides/images"):
-        slides_count = len([f for f in os.listdir("data/slides/images") 
-                          if f.lower().endswith(('.png', '.jpg', '.jpeg'))])
+    if os.path.exists(images_dir):
+        slides_count = len([f for f in os.listdir(images_dir) 
+                          if f.lower().endswith((".png", ".jpg", ".jpeg"))])
         if slides_count > 0:
             st.subheader(f"📊 Current Slides ({slides_count} total)")
-            
             # Show first few slides as preview
-            slide_files = sorted([f for f in os.listdir("data/slides/images") 
-                                if f.lower().endswith(('.png', '.jpg', '.jpeg'))])
-            
+            slide_files = sorted([f for f in os.listdir(images_dir) 
+                                if f.lower().endswith((".png", ".jpg", ".jpeg"))])
             cols = st.columns(min(3, len(slide_files)))
             for i, slide_file in enumerate(slide_files[:3]):
                 with cols[i]:
-                    slide_path = os.path.join("data/slides/images", slide_file)
-                    st.image(slide_path, caption=f"Slide {i+1}", use_column_width=True)
+                    slide_path = os.path.join(images_dir, slide_file)
+                    st.image(slide_path, caption=f"Slide {i+1}", use_container_width=True)
 
 def gesture_control_page():
     """Page for gesture control information."""
     st.header("🎮 Gesture Control Guide")
     
-    st.markdown("""
-    ### Workflow
-    
-    **PPTX → PDF → PNG → Gesture Control**
-    
-    1. **Upload PPTX** file through Streamlit
-    2. **Convert to PDF** using LibreOffice
-    3. **Convert PDF to PNG** images using pdf2image
-    4. **Control with gestures** using hand recognition
-    
+    st.markdown(""" 
     ### Hand Gestures
     
     Position your hand at face level (above the green threshold line) and use these gestures:
@@ -305,12 +302,6 @@ def gesture_control_page():
     - `r`: Reset all annotations
     - `n`: Next slide
     - `p`: Previous slide
-    
-    ### System Requirements
-    
-    - **LibreOffice**: For PPTX to PDF conversion
-    - **Poppler**: For PDF to image conversion (`sudo pacman -S poppler`)
-    - **Camera**: For gesture recognition
     
     ### Tips for Best Results
     
@@ -338,20 +329,6 @@ def settings_page():
             st.info("💡 Edit the config/gesture_config.json file to customize settings.")
     else:
         st.warning("⚠️ Configuration file not found.")
-    
-    st.subheader("Project Structure")
-    st.code("""
-Handgesture-Recognition/
-├── src/                    # Source code
-├── config/                 # Configuration files
-├── data/                   # Data and assets
-│   ├── pptx/               # Original PPTX files
-│   ├── slides/             # Converted images and PDFs
-│   │   ├── images/         # Slide images
-│   │   └── pdf/            # Slide PDFs
-│   └── samples/            # Sample images
-├── docs/                   # Documentation
-""")
 
 if __name__ == "__main__":
     main() 
