@@ -64,15 +64,25 @@ pip install -r config/requirements.txt
 
 ## Usage
 
-### 1. Start the Web Interface
+### 1.QuickStart(Recommended)
+Pull and run the pre-built Docker image directly from GitHub Container Registry:
 
 ```bash
-streamlit run main.py
+docker pull ghcr.io/xevansz/handgesture-recognition:latest
+docker run -p 8501:8501 ghcr.io/xevansz/handgesture-recognition:latest
 ```
 
-### 2. Run with Docker
+Open http://localhost:8501 and you're ready to go!
 
-Build the Docker image:
+### 2. Start the Streamlit app(Local development):
+'''bash
+streamlit run main.py
+'''
+
+
+### 2. Build and Run with Docker(Advanced)
+
+If you want to build from source or make modifications:
 
 ```bash
 docker build -t handgesture-recognition .
