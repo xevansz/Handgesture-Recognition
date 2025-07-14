@@ -35,11 +35,15 @@ Key features:
 
 - **Python 3.8+** is recommended (tested on Python 3.11).
 
+> **Note:**  
+> For best results, use on a Linux system with all system dependencies installed.
+> It has not been tested on **Windows or mac**.
+
 ### 2. Virtual Environment (Recommended)
 
 ```bash
 python3 -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+source .venv/bin/activate
 ```
 
 ### 3. Install Dependencies
