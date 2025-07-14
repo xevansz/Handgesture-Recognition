@@ -17,6 +17,7 @@ WORKDIR /app
 COPY config/requirements.txt ./requirements.txt
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
+
 # Copy the rest of the application code
 COPY . .
 
