@@ -10,16 +10,17 @@ RUN apt-get update && \
         wget \
         && rm -rf /var/lib/apt/lists/*
 
+# Install PDM
+RUN pip install --no-cache-dir pdm
+
 # Set the working directory
 WORKDIR /app
 
-# Copy requirements and install Python dependencies
-COPY config/requirements.txt ./requirements.txt
-RUN pip install --upgrade pip && pip install -r requirements.txt
-
-
-# Copy the rest of the application code
+# Copy project files
 COPY . .
+
+# Install Python dependencies with PDM
+RUN pdm install --prod
 
 # Expose the Streamlit default port
 EXPOSE 8501

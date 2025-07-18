@@ -49,7 +49,7 @@ source .venv/bin/activate
 ### 3. Install Dependencies
 
 ```bash
-pip install -r config/requirements.txt
+pdm install
 ```
 
 ### 4. System Requirements
@@ -145,20 +145,12 @@ docker run -v $(pwd)/data:/app/data --device=/dev/video0 -p 8501:8501 handgestur
 
 ### Python Dependencies
 
-Defined in **config/requirements.txt** file:
-- streamlit >= 1.28.0
-- opencv-python >= 4.8.0
-- cvzone >= 1.6.0
-- mediapipe >= 0.10.0
-- numpy >= 1.24.0
-- Pillow >= 10.0.0
-- pdf2image >= 1.16.3
-- python-pptx >= 0.6.21
-
-Install all with:
+All Python dependencies are managed with [PDM](https://pdm.fming.dev/):
+- See `pyproject.toml` for the full list.
+- Install all dependencies with:
 
 ```bash
-pip install -r config/requirements.txt
+pdm install
 ```
 
 ---
@@ -171,8 +163,7 @@ Handgesture-Recognition/
 │   └── gesture.py          # Gesture controller logic
 ├── main.py                 # Streamlit web app
 ├── config/                 # Configuration files
-│   ├── gesture_config.json # Gesture and app settings
-│   └── requirements.txt    # Python dependencies
+│   └── gesture_config.json # Gesture and app settings
 ├── data/                   # Data and assets
 │   ├── pptx/               # Uploaded PPTX files
 │   ├── slides/             # Converted slides
@@ -183,7 +174,8 @@ Handgesture-Recognition/
 ├── Dockerfile              # Docker build instructions
 ├── .dockerignore           # Docker ignore file
 ├── LICENSE                 # MIT License
-└── README.md               # This file
+├── README.md               # This file
+└── pyproject.toml          # PDM project configuration
 ```
 
 ---

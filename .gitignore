@@ -50,3 +50,6 @@ Thumbs.db
 
 # Ignore config secrets
 config/*.secret.json
+
+# pdm files
+.pdm-Python
